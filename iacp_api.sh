@@ -21,6 +21,7 @@ api()
 commands()
 {
 cat << !
+account                get     GET /api/iacp/v3/account/details
 apply                  get     GET /api/iacp/v3/applies/{apply}
 configuration-version  get     GET /api/iacp/v3/configuration-versions/{configuration_version}
 ingress-attributes     get     GET /api/iacp/v3/configuration-versions/{configuration_version}/ingress-attributes
@@ -28,6 +29,8 @@ configuration-versions list    GET /api/iacp/v3/workspaces/{workspace}/configura
 configuration-versions create  POST /api/iacp/v3/workspaces/{workspace}/configuration-versions
 cost-estimate          get     GET /api/iacp/v3/cost-estimates/{cost_estimate}
 cost-estimates         get-log GET /api/iacp/v3/cost-estimates/{cost_estimate}/output
+idps                   list    GET /api/iacp/v3/identity-providers
+idp                    get     GET /api/iacp/v3/identity-providers/{id}
 organizations          list    GET /api/iacp/v3/organizations
 organization           get     GET /api/iacp/v3/organizations/{organization}
 module                 create  POST /api/iacp/v3/organizations/{organization}/registry-modules
@@ -63,12 +66,42 @@ state-versions         list    GET /api/iacp/v3/state-versions
 state-version          get     GET /api/iacp/v3/state-versions/{state_version}
 state-version          get-current GET /api/iacp/v3/workspaces/{workspace}/current-state-version
 state-version          create  POST /api/iacp/v3/workspaces/{workspace}/state-versions
+users                  list    GET /api/iacp/v3/users
+user                   get     GET /api/iacp/v3/users/{id}
 vars                   list    GET /api/iacp/v3/vars
 var                    create  POST /api/iacp/v3/vars
 var                    delete  DELETE /api/iacp/v3/vars/{var}
 var                    get     GET /api/iacp/v3/vars/{var}
 var                    update  PATCH /api/iacp/v3/vars/{var}
 !
+}
+
+aliases ()
+{
+  cat << !
+acc  account
+accs accounts
+app apply
+cfv  configuration_version
+cfvs configuration_versions
+cse cost_estimate
+cses cost_estimates
+org organization
+orgs organizations
+mod module
+mods modules
+ws workspace
+wss workspaces
+ows org-workspace
+pl plan
+stv state_version
+stvs state_versions
+!
+}
+obj_alias ()
+{
+  ALIAS=$(echo $(aliases | awk -v OBJ=$OBJECT '{if ($1 == OBJ) {print $2}}'))
+  echo ${ALIAS:-$OBJECT}
 }
 
 # List the commands and their inputs
@@ -146,6 +179,9 @@ if [[ $ACTION == "help" ]]; then
    usage | awk -v OBJ=$OBJECT '{if ($1 == OBJ || $1 == "Usage:") print $0}'
    exit
 fi
+
+# convert alias
+OBJECT=$(obj_alias)
 
 # Check we have the right number of inputs on the command line
 
