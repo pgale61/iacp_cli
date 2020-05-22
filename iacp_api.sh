@@ -3,15 +3,14 @@
 api()
 {
 
-  if [[ $HTTP_OP = "POST" || $HTTP_OP = "PATCH" ]]; then
+  if [[ $ACTION = "create" || $ACTION = "update" ]]; then
      curl -s -X ${HTTP_OP} ${API_URL}${THE_PATH} \
                 -H "Authorization: Bearer $TOKEN" \
                 -H "Content-Type: application/vnd.api+json" \
 	              --data "@/var/tmp/$0.$$.json"
   else
          curl -s -X ${HTTP_OP} ${API_URL}${THE_PATH} \
-                    -H "Authorization: Bearer $TOKEN" \
-                    -H "Content-Type: application/vnd.api+json"
+                    -H "Authorization: Bearer $TOKEN"
   fi
 
 }
