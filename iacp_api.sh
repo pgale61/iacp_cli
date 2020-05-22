@@ -3,8 +3,6 @@
 api()
 {
 
-  set -x
-
   if [[ $HTTP_OP = "POST" || $HTTP_OP = "PATCH" ]]; then
      curl -s -X ${HTTP_OP} ${API_URL}${THE_PATH} \
                 -H "Authorization: Bearer $TOKEN" \
@@ -207,28 +205,26 @@ done
 
 eval THE_PATH=$THE_PATH
 
+TEMP_FILE=/var/tmp/$(basename $0).$$.json
+
 # For updates get the current settings
 if [[ $ACTION == "update" ]]; then
    HTTP_OP_ORIG=$HTTP_OP
    HTTP_OP=GET
 
-   api | jq '.' > /var/tmp/$0.$$.json
+   api | jq '.' > $TEMP_FILE
 
    HTTP_OP=$HTTP_OP_ORIG
 
-   vi /var/tmp/$0.$$.json
-
-   BODY="$(cat /var/tmp/$0.$$.json)"
+   vi $TEMP_FILE
 
 fi
 
 # For create provide a template
 if [[ $ACTION == "create" ]]; then
-   cp $OBJECT-$ACTION.json /var/tmp/$0.$$.json
+   cp templates/$OBJECT-$ACTION.json $TEMP_FILE
 
-   vi /var/tmp/$0.$$.json
-
-   BODY="$(cat /var/tmp/$0.$$.json)"
+   vi $TEMP_FILE
 
 fi
 
@@ -239,3 +235,5 @@ fi
 # Arrays are implied by repetion of the same key=value pair
 
 api | jq '.'
+
+rm -f $TEMP_FILE
