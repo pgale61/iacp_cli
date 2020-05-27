@@ -3,7 +3,7 @@
 api()
 {
 
-  if [[ $ACTION = "create" || $ACTION = "update" ]]; then
+  if [[ $ACTION = "create" || $ACTION = "update"  || $ACTION = "publish" ]]; then
      curl -s -X ${HTTP_OP} ${API_URL}${THE_PATH} \
                 -H "Authorization: Bearer $TOKEN" \
                 -H "Content-Type: application/vnd.api+json" \
@@ -220,7 +220,7 @@ if [[ $ACTION == "update" ]]; then
 fi
 
 # For create provide a template
-if [[ $ACTION == "create" ]]; then
+if [[ $ACTION == "create" || $ACTION = "publish" ]]; then
    cp templates/$OBJECT-$ACTION.json $TEMP_FILE
 
    vi $TEMP_FILE
